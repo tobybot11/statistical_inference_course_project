@@ -6,14 +6,12 @@ output:
   html_document:
     fig.captions: yes
     keep_md: yes
-    toc: yes
-  pdf_document:
-    toc: yes
-    latex_engine: xelatex
+    toc: no
 ---
 
 ```{r set-options, echo=FALSE}
-options(width = 80)
+options(width = 80, digits=2)
+set.seed(42)
 ```
 
 # Statistical Inference Course Project : Comparing Random Distributions
@@ -21,27 +19,16 @@ options(width = 80)
 ## Overview
 
 Investingating the exponential distribution in R and comparing it to the Central Limit Theorem.
-
 The exponential distribution can be simulated in R with rexp(n, lambda) where lambda is the rate parameter. 
-
 The mean of exponential distribution is 1/lambda and the standard deviation is also 1/lambda. 
 
 Set lambda = 0.2 for all of the simulations. 
-
-
-```{r}
-Lambda = 0.2
-```
-
 You will investigate the distribution of averages of 40 exponentials. 
-
-```{r}
-Exponentials = 40
-```
-
 Note that you will need to do a thousand simulations.
 
 ```{r}
+Lambda = 0.2
+Exponentials = 40
 Simulations = 1000
 ```
 
@@ -53,89 +40,53 @@ Illustrate via simulation and associated explanatory text the properties of the 
 
 In point 3, focus on the difference between the distribution of a large collection of random exponentials and the distribution of a large collection of averages of 40 exponentials.
 
-### Inital Setup
-```{r}
-set.seed(42)
-```
-
-### What does the exponential distribution look like again?
-
-```{r}
-x <- seq(0, 4, length=100)
-hx <- dexp(x)
-plot(x, hx, type='l')
-```
-
 ## Simulations
 
 Let's start by doing the simulations
-
 ```{r}
 SampleMeans <- sapply(1:Simulations, function(x) { mean(rexp(Exponentials, Lambda)) } )
-
-head(SampleMeans,10)
 ```
+The first ten samples are **`r head(SampleMeans,10)`**.
 
 ## Sample Mean vs. Theoretical Mean 
 
-Include figures with titles; Highlight the means you are comparing
-Include text that explains the figures and what is shown on them.. and provides appropriate numbers
-
-Mean of all the simulated means of the 40x random exponential distributins 
+Determine mean of all the simulated means of the 40x random exponential distributions and then determine the diffference between Sample Mean and Theoretical Mean. Theoretcial Mean and Standard Deviation is 1/Lambda. 
 
 ```{r}
 OverallSampleMean = mean(SampleMeans)
-OverallSampleMean
+TheoreticalMean = 1/Lambda 
 ```
+The Sample Mean is **`r OverallSampleMean`**. The Theoretical Mean is **`r TheoreticalMean`**.
 
-Standard Deviation of all the simulated means of the 40x random exponential distributins 
+**Analysis** : Close Enough! Sample Mean is very close (**`r TheoreticalMean-OverallSampleMean`**) to Theoretical Mean.
+
+Determine Diffference between Sample Standard Deviation and Theoretical Standard Deviation.
+
 ```{r}
 OverallSampleStandardDeviation = sd(SampleMeans)
-OverallSampleStandardDeviation
+TheoreticalStandardDeviation =  1/Lambda / sqrt(40) 
 ```
 
-Theoretcial Mean and Standard Deviation is 1/Lambda
+The Sample Standard Deviation is **`r OverallSampleStandardDeviation`**. The Theoretical Standard deviation is **`r TheoreticalStandardDeviation`**.
 
-```{r}
-TheoreticalMean = 1/Lambda 
-OverallSampleMean - TheoreticalMean
-```
-Analysis : Close Enough!
-
-```{r}
-TheoreticalStandardDeviation = ( 1/Lambda / sqrt(40) )
-OverallSampleStandardDeviation - TheoreticalStandardDeviation
-```
-Analysis : Close Enough!
-
+**Analysis** : Close Enough! Sample Standard Deviation is very close (**`r OverallSampleStandardDeviation - TheoreticalStandardDeviation`**) to the Theoretical Standard Deviation.
 
 ## Sample Variance vs. Theoretical Variance
 
- Include figures (output from R) with titles. Highlight the variances you are comparing. Include text that explains your understanding of the differences of the variances.
-
-Variance of the Simulations
+Variance of the Simulations and Expected Variance 
 
 ```{r}
 SampleVariance = var(SampleMeans)
-SampleVariance
-```
-
-Expected Variance 
-```{r}
 ExpectedVariance = ( 1/Lambda / sqrt(40) )^2
-ExpectedVariance
 ```
+The Sample Variance is **`r SampleVariance`**. The Expected Variance is **`r ExpectedVariance`**.
 
-Difference between the two..
-```{r}
-ExpectedVariance - SampleVariance
-```
-Analysis : Close Enough!
+**Analysis** : Close Enough! Sample Variance is very close (**`r SampleVariance - ExpectedVariance`**) to the Expected Variance.
 
 ## Distribution
 Via figures and text, explain how one can tell the distribution is approximately normal.
 
-```{r}
+```{r, echo=FALSE, fig.cap="**Distribution at 1000 samples of the means of 40 exponentials, overlayed with the normal distribution with the expected mean and standard deviation.**" }
 library(ggplot2)
 df = data.frame(means = SampleMeans)
 ggplot(data = df, aes(x=means)) + 
@@ -147,10 +98,23 @@ ggplot(data = df, aes(x=means)) +
 	    geom_vline(xintercept=5, color=I("red"))
 ```
 
-The distribution of the sampled means fits into the normal distribution defined by TheoreticalMean (1/lambda) and TheoreticalStandardDeviation.
-Analysis: Looks normal to me at 1000 samples. What would this look like for 10000?
+**Analysis**: The distribution of the sampled means fits into the normal distribution defined by TheoreticalMean (1/lambda) and TheoreticalStandardDeviation. Looks normal to me at 1000 samples. What would this look like for 10000? See Appendix
 
-```{r}
+### Comparison to a large collection of random exponentials.
+
+What is the difference between the distribution of a large collection of random exponentials and the distribution of a large collection of averages of 40 exponentials?
+
+```{r, echo=FALSE, fig.cap="**Distribution of 1000 exponentials.**" }
+hist(rexp(1000, Lambda))
+```
+
+**Analysis**: As we've seen, 1000 Averages of 40 exponentials is normally distributed whereas a large collection (1000) of random exponentials fits closer to what an exponential curve looks like.
+
+## Apendix
+
+### What does a distribution of 10000 samples of the means of 40 exponentials look like?
+
+```{r, echo=FALSE, fig.cap="**Distribution at 10000 samples of the means of 40 exponentials overlayed by the normal distribution.**" }
 Simulations = 10000
 SampleMeans <- sapply(1:Simulations, function(x) { mean(rexp(Exponentials, Lambda)) } )
 
@@ -163,4 +127,5 @@ ggplot(data = df, aes(x=means)) +
 	    stat_function(fun = dnorm, arg = list(mean = TheoreticalMean, sd = TheoreticalStandardDeviation))+
 	    geom_vline(xintercept=5, color=I("red"))
 ```
-Analysis: Even Closer to the normal distribution with more data.
+
+**Analysis**: Even Closer to the normal distribution with more data.
