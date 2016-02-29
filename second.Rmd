@@ -1,0 +1,120 @@
+---
+title: 'Statistical Inference Course Project'
+author: "Tobias Ford"
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    fig.captions: yes
+    keep_md: yes
+    toc: no
+---
+
+```{r set-options, echo=FALSE}
+options(width = 80, digits=2)
+set.seed(42)
+library(knitr)
+library(ggplot2)
+```
+
+# Statistical Inference Course Project : Tooth Growth
+
+## Overview
+
+Now in the second portion of the assignment, we're going to analyze the ToothGrowth data in the R datasets package.
+The ToothGrowth is a data set of 60 observations of the length of teeth in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1 and 2 mg) with each of two delivery methods, one with orange juice or another with ascorbic acid.
+
+## Load the ToothGrowth data and perform some basic exploratory data analyses
+
+```{r, echo=FALSE}
+data(ToothGrowth)
+```
+
+First 3 rows of the ToothGrowth data set and the header.
+
+```{r,echo=FALSE}
+kable(head(ToothGrowth, 3))
+```
+
+```{r, echo=FALSE}
+ToothGrowth$dose<-as.factor(ToothGrowth$dose)
+```
+
+## Provide a basic summary of the data.
+
+```{r}
+summary(ToothGrowth)
+```
+
+## Data Analysis
+
+First let's visualize the data to gain some intuition about what is going on in it.
+
+Graph the data split amonst the different supplement types.
+
+```{r, echo=FALSE, fig.width=7, fig.height=5}
+ggplot(data=ToothGrowth, aes(x=supp, y=len)) + 
+			 geom_boxplot(aes(fill=supp))+ 
+			 xlab("Supplement type") +ylab("Tooth length")
+```
+
+From the plot, it's pretty hard to see how supplement type positively impacted tooth growth.
+Even thought the 'OJ' supplment type shows a higher density then 'VC', 'VC's range of tooth length encompses 'OC'.
+
+Now check the effect of vitamin C dose on tooth length.
+
+```{r, echo=FALSE}
+ggplot(data=ToothGrowth, aes(x=dose, y=len)) + 
+			 geom_boxplot(aes(fill=dose))+ 
+			 xlab("Dose in mg") +ylab("Tooth length")
+```
+
+From the plot, it's pretty easy to see how dosage size positively impacted tooth growth.
+Let's use what we've learned in class to show this with statistical inference.
+
+### Conclusions via Statistical Inference
+
+The two main questions to answer.. 
+Do the tooth length of the guinea pigs depends on delivery methods? 
+Do the tooth length of the guinea pigs depends on dosage amounts?
+
+A t test will be performed on each of the potential hypothesis which caused tooth length to increase.
+
+```{r}
+Length <- ToothGrowth$len; SupplementType <- ToothGrowth$supp; Dose <- ToothGrowth$dose
+
+tOJtoVC <- t.test(ToothGrowth$len[ToothGrowth$supp=="OJ"], ToothGrowth$len[ToothGrowth$supp=="VC"], 
+	paired = FALSE, var.equal = FALSE)
+
+t1to2 <- t.test(ToothGrowth$len[ToothGrowth$dose==2], ToothGrowth$len[ToothGrowth$dose==1], 
+        paired = FALSE, var.equal = TRUE)
+
+t0.5to1 <- t.test(ToothGrowth$len[ToothGrowth$dose==1], ToothGrowth$len[ToothGrowth$dose==0.5], 
+	paired = FALSE, var.equal = TRUE)
+
+t0.5to2 <- t.test(ToothGrowth$len[ToothGrowth$dose==2], ToothGrowth$len[ToothGrowth$dose==0.5], 
+	paired = FALSE, var.equal = TRUE)
+```
+
+```{r, echo=FALSE}
+df <- data.frame(
+   'null hypotheses'=c('OJ to VC', '1 to 2', '0.5 to 1', '0.5 to 2'),
+   'p value'=c(tOJtoVC$p.value, t1to2$p.value, t0.5to1$p.value, t0.5to2$p.value),
+   conf.int.low=c(tOJtoVC$conf.int[1], t1to2$conf.int[1], t0.5to1$conf.int[1], t0.5to2$conf.int[1]),
+   conf.int.high=c(tOJtoVC$conf.int[2], t1to2$conf.int[2], t0.5to1$conf.int[2], t0.5to2$conf.int[2]),
+   is.zero.within.conf.int=c(
+	tOJtoVC$conf.int[1] < 0 && 0 < tOJtoVC$conf.int[2], 
+	t1to2$conf.int[1] < 0 && 0 < t1to2$conf.int[2], 
+        t0.5to1$conf.int[1] < 0 && 0 < t0.5to1$conf.int[2], 
+	t0.5to2$conf.int[1] < 0 && 0 < t0.5to2$conf.int[2]
+     )
+)
+```
+
+```{r, echo=FALSE}
+kable(df)
+```
+
+The p-value of the t test for the change in supplement type is around 0.06, very close to the default significance level of 0.05, and the confidence interval includes 0. In each case evidence we can't definitively reject the null hypothesis in comparison of supplement type against positive effect on tooth length. After this analysis we can't conclude that supplement type has an effect on tooth length.
+
+The p-value of the t test for all three dosage changes is essentially 0 and the confidence interval in each case doesn't contain 0. Evidence that we can reject the null hypothesis in comparison of dosages versus tooth length. Therefore, we can assume that a increase in dosage creates an positive effect on tooth length. 
+

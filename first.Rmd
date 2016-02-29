@@ -56,9 +56,7 @@ Determine mean of all the simulated means of the 40x random exponential distribu
 OverallSampleMean = mean(SampleMeans)
 TheoreticalMean = 1/Lambda 
 ```
-The Sample Mean is **`r OverallSampleMean`**. The Theoretical Mean is **`r TheoreticalMean`**.
-
-**Analysis** : Close Enough! Sample Mean is very close (**`r TheoreticalMean-OverallSampleMean`**) to Theoretical Mean.
+**Analysis** : The Sample Mean is **`r OverallSampleMean`**. The Theoretical Mean is **`r TheoreticalMean`**. Sample Mean is very close (**`r TheoreticalMean-OverallSampleMean`**) to Theoretical Mean. Close Enough!
 
 Determine Diffference between Sample Standard Deviation and Theoretical Standard Deviation.
 
@@ -67,9 +65,7 @@ OverallSampleStandardDeviation = sd(SampleMeans)
 TheoreticalStandardDeviation =  1/Lambda / sqrt(40) 
 ```
 
-The Sample Standard Deviation is **`r OverallSampleStandardDeviation`**. The Theoretical Standard deviation is **`r TheoreticalStandardDeviation`**.
-
-**Analysis** : Close Enough! Sample Standard Deviation is very close (**`r OverallSampleStandardDeviation - TheoreticalStandardDeviation`**) to the Theoretical Standard Deviation.
+**Analysis** : The Sample Standard Deviation is **`r OverallSampleStandardDeviation`**. The Theoretical Standard deviation is **`r TheoreticalStandardDeviation`**. Close Enough! Sample Standard Deviation is very close (**`r OverallSampleStandardDeviation - TheoreticalStandardDeviation`**) to the Theoretical Standard Deviation.
 
 ## Sample Variance vs. Theoretical Variance
 
@@ -79,14 +75,13 @@ Variance of the Simulations and Expected Variance
 SampleVariance = var(SampleMeans)
 ExpectedVariance = ( 1/Lambda / sqrt(40) )^2
 ```
-The Sample Variance is **`r SampleVariance`**. The Expected Variance is **`r ExpectedVariance`**.
 
-**Analysis** : Close Enough! Sample Variance is very close (**`r SampleVariance - ExpectedVariance`**) to the Expected Variance.
+**Analysis** : The Sample Variance is **`r SampleVariance`**. The Expected Variance is **`r ExpectedVariance`**. Close Enough! Sample Variance is very close (**`r SampleVariance - ExpectedVariance`**) to the Expected Variance.
 
 ## Distribution
 Via figures and text, explain how one can tell the distribution is approximately normal.
 
-```{r, echo=FALSE, fig.cap="**Distribution at 1000 samples of the means of 40 exponentials, overlayed with the normal distribution with the expected mean and standard deviation.**" }
+```{r, echo=FALSE, fig.width=5, fig.height=2.5, fig.cap="**Fig.1 Distribution at 1000 samples of the means of 40 exponentials, overlayed with the normal distribution with the expected mean and standard deviation.**" }
 library(ggplot2)
 df = data.frame(means = SampleMeans)
 ggplot(data = df, aes(x=means)) + 
@@ -104,7 +99,7 @@ ggplot(data = df, aes(x=means)) +
 
 What is the difference between the distribution of a large collection of random exponentials and the distribution of a large collection of averages of 40 exponentials?
 
-```{r, echo=FALSE, fig.cap="**Distribution of 1000 exponentials.**" }
+```{r, echo=FALSE, fig.cap="**Fig.2 Distribution of 1000 exponentials.**", fig.width=6, fig.height=4 }
 hist(rexp(1000, Lambda))
 ```
 
@@ -114,7 +109,7 @@ hist(rexp(1000, Lambda))
 
 ### What does a distribution of 10000 samples of the means of 40 exponentials look like?
 
-```{r, echo=FALSE, fig.cap="**Distribution at 10000 samples of the means of 40 exponentials overlayed by the normal distribution.**" }
+```{r, echo=FALSE, fig.cap="**Fig.3 Distribution at 10000 samples of the means of 40 exponentials overlayed by the normal distribution.**" }
 Simulations = 10000
 SampleMeans <- sapply(1:Simulations, function(x) { mean(rexp(Exponentials, Lambda)) } )
 
